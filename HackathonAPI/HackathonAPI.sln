@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34221.43
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackathonAPI", "HackathonAPI.csproj", "{490A88AC-96F2-4805-BFFB-E20597A3C3FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLayer", "..\BusinessLayer\BusinessLayer.csproj", "{4C63726A-0FFE-40B4-B5EC-60493ACEDB30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "..\Models\Models.csproj", "{A80A76B2-6212-432C-BC85-CCD5446F5D10}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{490A88AC-96F2-4805-BFFB-E20597A3C3FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{490A88AC-96F2-4805-BFFB-E20597A3C3FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{490A88AC-96F2-4805-BFFB-E20597A3C3FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{490A88AC-96F2-4805-BFFB-E20597A3C3FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C63726A-0FFE-40B4-B5EC-60493ACEDB30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C63726A-0FFE-40B4-B5EC-60493ACEDB30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C63726A-0FFE-40B4-B5EC-60493ACEDB30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C63726A-0FFE-40B4-B5EC-60493ACEDB30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A80A76B2-6212-432C-BC85-CCD5446F5D10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A80A76B2-6212-432C-BC85-CCD5446F5D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A80A76B2-6212-432C-BC85-CCD5446F5D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A80A76B2-6212-432C-BC85-CCD5446F5D10}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9FEBE476-41A1-40BF-A13F-BAB221086A99}
+	EndGlobalSection
+EndGlobal
