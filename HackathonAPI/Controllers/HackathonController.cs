@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -49,6 +50,7 @@ namespace HackathonAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> AddHackathon([FromBody] Hackathon hackathon)
         {
             try
@@ -71,6 +73,7 @@ namespace HackathonAPI.Controllers
 
 
         [HttpPut("{id}")]
+        [Authorize(Roles = ("Admin"))]
         public async Task<IActionResult> UpdateHackathon(int id, [FromBody] Hackathon hackathon)
         {
             try
@@ -93,6 +96,7 @@ namespace HackathonAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles =("Admin"))]
         public async Task<IActionResult> DeleteHackathon(int id)
         {
             try
@@ -114,6 +118,7 @@ namespace HackathonAPI.Controllers
         }
 
             [HttpPost("RegisterTeam")]
+        [Authorize]
             public async Task<IActionResult> RegisterTeam([FromBody] TeamRegisteration teamRegistration)
             {
                 try

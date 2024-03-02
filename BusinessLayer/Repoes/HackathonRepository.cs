@@ -94,6 +94,7 @@ namespace BusinessLayer.Repoes
                 return new BaseResult { IsSuccess = false, Message = "Something went wrong while updating hackathon" };
             }
         }
+     
         public async Task<BaseResult> DeleteHackathon(int id)
         {
             try
@@ -135,6 +136,8 @@ namespace BusinessLayer.Repoes
                 return new BaseResult { IsSuccess = false, Message = $"An error occurred while deleting hackathon: {ex.Message}" };
             }
         }
+
+    
         public async Task<BaseResult> RegisterInHackathon(TeamRegisteration teamRegistration)
         {
             try

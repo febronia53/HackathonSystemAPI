@@ -20,5 +20,33 @@ namespace Models
         public DbSet<Hackathon>Hackathons { get; set; }
         public DbSet<ChallengeTitle> ChallengeTitles { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Configure relationships for TeamRegisteration entity
+            modelBuilder.Entity<TeamRegisteration>()
+                .HasOne(tr => tr.ChallengeTitle)
+                .WithMany()
+                .HasForeignKey(tr => tr.ChallengeTitleId);
+
+            modelBuilder.Entity<TeamRegisteration>()
+                .HasOne(tr => tr.Hackathon)
+                .WithMany(h => h.TeamRegisterations)
+                .HasForeignKey(tr => tr.HackathonID);
+
+            // Configure relationships for TeamMember entity
+            modelBuilder.Entity<TeamMember>()
+                .HasOne(tm => tm.TeamRegisteration)
+                .WithMany(tr => tr.TeamMembers)
+                .HasForeignKey(tm => tm.TeamRegisterationId);
+
+            // Configure relationships for Hackathon entity
+            modelBuilder.Entity<Hackathon>()
+                .HasMany(h => h.ChallengeTitles)
+                .WithMany()
+                .UsingEntity(j => j.ToTable("HackathonChallengeTitles"));
+
+            base.OnModelCreating(modelBuilder);
+        }
+
     }
 }

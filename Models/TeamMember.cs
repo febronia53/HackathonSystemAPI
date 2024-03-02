@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Models
@@ -22,6 +23,10 @@ namespace Models
         public string Email { get; set; }
 
         public string Mobile { get; set; }
+
+        public int TeamRegisterationId {  get; set; }
+        [JsonIgnore]
+        public TeamRegisteration? TeamRegisteration { get; set; }
 
     
 

@@ -15,6 +15,20 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(x => x.UseSqlServer(connectionString));
 builder.Services.AddScoped<IHackathonRepository, HackathonRepository>();
 
+ builder.Services.AddCors(options =>
+{
+
+    options.AddPolicy("AllowOrigin",
+
+        builder => builder.AllowAnyOrigin()
+
+                          .AllowAnyHeader()
+
+                          .AllowAnyMethod());
+
+});
+
+
 
 
 // For Identity
@@ -73,5 +87,5 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 app.MapControllers();
-
+app.UseCors("AllowOrigin");
 app.Run();
