@@ -13,13 +13,15 @@ public class AuthenticationController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _config;
 
-    public AuthenticationController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration config)
+    public AuthenticationController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, IConfiguration config)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _config = config;
+        _roleManager = roleManager;
     }
 
     [HttpPost("register")]
@@ -37,7 +39,9 @@ public class AuthenticationController : ControllerBase
         {
             await _signInManager.SignInAsync(user, isPersistent: false);
             var tokenString = GenerateJwtToken(user);
-            return Ok(new { Token = tokenString });
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            return Ok(new { Token = tokenString, Roles = userRoles });
         }
 
         return BadRequest(result.Errors);
@@ -50,11 +54,23 @@ public class AuthenticationController : ControllerBase
         if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
         {
             var tokenString = GenerateJwtToken(user);
-            return Ok(new { Token = tokenString });
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            return Ok(new
+            {
+
+                Token = tokenString,
+                Roles = userRoles
+
+
+            });
         }
+
 
         return Unauthorized();
     }
+
+
 
     private string GenerateJwtToken(ApplicationUser user)
     {
@@ -73,6 +89,7 @@ public class AuthenticationController : ControllerBase
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+
 }
 
 public class RegisterModel

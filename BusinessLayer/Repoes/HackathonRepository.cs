@@ -135,7 +135,71 @@ namespace BusinessLayer.Repoes
                 return new BaseResult { IsSuccess = false, Message = $"An error occurred while deleting hackathon: {ex.Message}" };
             }
         }
+        public async Task<BaseResult> RegisterInHackathon(TeamRegisteration teamRegistration)
+        {
+            try
+            {
+                // Assuming teamRegistration object contains necessary information, including TeamMembers
 
+                // Validate if the required fields are present
+                if (string.IsNullOrEmpty(teamRegistration.TeamName) || teamRegistration.TeamMembers == null || !teamRegistration.TeamMembers.Any())
+                {
+                    return new BaseResult { IsSuccess = false, Message = "Invalid team registration data" };
+                }
+
+                // Check if each team member is already registered in another hackathon
+                foreach (var teamMember in teamRegistration.TeamMembers)
+                {
+                    bool isMemberRegisteredInAnotherHackathon = await IsTeamMemberRegisteredInAnyHackathon(teamMember.TeamMemberID);
+                    if (isMemberRegisteredInAnotherHackathon)
+                    {
+                        return new BaseResult { IsSuccess = false, Message = $"Team member '{teamMember.Name}' is already registered in another hackathon" };
+                    }
+
+                    bool isMemberAlreadyInTeam = await IsTeamMemberAlreadyInTeam(teamMember.TeamMemberID, teamRegistration.HackathonID);
+                    if (isMemberAlreadyInTeam)
+                    {
+                        return new BaseResult { IsSuccess = false, Message = $"Team member '{teamMember.Name}' is already a member of another team in the same hackathon" };
+                    }
+                }
+
+                // You can add more validation logic as needed
+
+                // Add the team registration to the context
+                _context.TeamRegisterations.Add(teamRegistration);
+
+                // Save changes to the database
+                var saved = await _context.SaveChangesAsync();
+
+                // Check if the registration was successful
+                if (saved > 0)
+                {
+                    return new BaseResult { IsSuccess = true, Message = "Team registered successfully in the hackathon" };
+                }
+                else
+                {
+                    return new BaseResult { IsSuccess = false, Message = "Something went wrong while registering the team in the hackathon" };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BaseResult { IsSuccess = false, Message = $"An error occurred while registering the team in the hackathon: {ex.Message}" };
+            }
+        }
+
+        private async Task<bool> IsTeamMemberRegisteredInAnyHackathon(int teamMemberId)
+        {
+            // Check if the team member is registered in any hackathon
+            return await _context.TeamRegisterations
+                .AnyAsync(tr => tr.TeamMembers.Any(tm => tm.TeamMemberID == teamMemberId));
+        }
+
+        private async Task<bool> IsTeamMemberAlreadyInTeam(int teamMemberId, int hackathonId)
+        {
+            // Check if the team member is already a member of another team in the same hackathon
+            return await _context.TeamRegisterations
+                .AnyAsync(tr => tr.HackathonID == hackathonId && tr.TeamMembers.Any(tm => tm.TeamMemberID == teamMemberId));
+        }
 
 
     }

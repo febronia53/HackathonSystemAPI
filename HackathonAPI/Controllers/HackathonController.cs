@@ -112,6 +112,30 @@ namespace HackathonAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-    }
-}
+
+            [HttpPost("RegisterTeam")]
+            public async Task<IActionResult> RegisterTeam([FromBody] TeamRegisteration teamRegistration)
+            {
+                try
+                {
+                    var result = await _hackathonRepository.RegisterInHackathon(teamRegistration);
+
+                    if (result.IsSuccess)
+                    {
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        return BadRequest(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Internal server error: {ex.Message}");
+                }
+            }
+        }
+
+ }
+
 

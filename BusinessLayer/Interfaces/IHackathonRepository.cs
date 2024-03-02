@@ -17,5 +17,7 @@ namespace BusinessLayer.Interfaces
         Task<BaseResult> UpdateHackathon(Hackathon hackathonToUpdate);
 
         Task<BaseResult> DeleteHackathon(int id);
+        Task<BaseResult> RegisterInHackathon(TeamRegisteration teamRegistration);
+
     }
 }
