@@ -18,6 +18,7 @@ namespace HackathonAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllHackathons()
         {
             try
@@ -50,7 +51,7 @@ namespace HackathonAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = ("Admin"))]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddHackathon([FromBody] Hackathon hackathon)
         {
             try
@@ -96,7 +97,7 @@ namespace HackathonAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles =("Admin"))]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteHackathon(int id)
         {
             try
@@ -118,7 +119,7 @@ namespace HackathonAPI.Controllers
         }
 
             [HttpPost("RegisterTeam")]
-        [Authorize]
+            [Authorize]
             public async Task<IActionResult> RegisterTeam([FromBody] TeamRegisteration teamRegistration)
             {
                 try

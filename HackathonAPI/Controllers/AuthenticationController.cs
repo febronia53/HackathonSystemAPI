@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BusinessLayer.Shared;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -25,70 +26,95 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterModel model)
+    public async Task<IActionResult> Register([FromBody] RegisterModel viewModel)
     {
+        var userExists = await _userManager.FindByNameAsync(viewModel.Username);
+        if (userExists != null)
+            return StatusCode(StatusCodes.Status500InternalServerError, new BaseResult { Message = "User already exists!" });
+
         var user = new ApplicationUser
         {
-            UserName = model.Username,
-            Email = model.Email,
-            // Add more properties as needed
+          
+            Email = viewModel.Email,
+            SecurityStamp = Guid.NewGuid().ToString(),
+            UserName = viewModel.Username,
+
         };
+        var result = await _userManager.CreateAsync(user, viewModel.Password);
+        if (!result.Succeeded)
+            return StatusCode(StatusCodes.Status500InternalServerError, new BaseResult { Message = "User creation failed! Please check user details and try again." });
 
-        var result = await _userManager.CreateAsync(user, model.Password);
-        if (result.Succeeded)
-        {
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            var tokenString = GenerateJwtToken(user);
-            var userRoles = await _userManager.GetRolesAsync(user);
 
-            return Ok(new { Token = tokenString, Roles = userRoles });
-        }
 
-        return BadRequest(result.Errors);
+        return Ok(new BaseResult { IsSuccess = true, Message = "User created successfully!" });
     }
 
+
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginModel model)
+    public async Task<IActionResult> Login([FromBody] LoginModel viewModel)
     {
-        var user = await _userManager.FindByNameAsync(model.Username);
-        if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+        var user = await _userManager.FindByNameAsync(viewModel.Username);
+        if (user != null && await _userManager.CheckPasswordAsync(user, viewModel.Password))
         {
-            var tokenString = GenerateJwtToken(user);
             var userRoles = await _userManager.GetRolesAsync(user);
+
+            var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
+
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            var token = GetToken(authClaims);
 
             return Ok(new
             {
-
-                Token = tokenString,
-                Roles = userRoles
-
-
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                Roles = userRoles.ToList(),
+                user.Email,
+           
+                expiration = token.ValidTo
             });
         }
-
-
         return Unauthorized();
     }
 
-
-
-    private string GenerateJwtToken(ApplicationUser user)
+    private JwtSecurityToken GetToken(List<Claim> authClaims)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_config["Jwt:Secret"]);
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                // Add more claims as needed
-            }),
-            Expires = DateTime.UtcNow.AddHours(1),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
+
+        var token = new JwtSecurityToken(
+            issuer: _config["JWT:ValidIssuer"],
+            audience: _config["JWT:ValidAudience"],
+            expires: DateTime.Now.AddDays(1),
+            claims: authClaims,
+            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+
+        return token;
     }
+    //private string GenerateJwtToken(ApplicationUser user)
+    //{
+    //    var tokenHandler = new JwtSecurityTokenHandler();
+    //    var key = Encoding.ASCII.GetBytes(_config["Jwt:Secret"]);
+    //    var tokenDescriptor = new SecurityTokenDescriptor
+    //    {
+    //        Subject = new ClaimsIdentity(new Claim[]
+    //        {
+    //            new Claim(ClaimTypes.Name, user.UserName),
+    //            // Add more claims as needed
+    //        }),
+    //        Expires = DateTime.UtcNow.AddHours(1),
+    //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+    //    };
+    //    var token = tokenHandler.CreateToken(tokenDescriptor);
+    //    return tokenHandler.WriteToken(token);
+    //}
 
 }
 
